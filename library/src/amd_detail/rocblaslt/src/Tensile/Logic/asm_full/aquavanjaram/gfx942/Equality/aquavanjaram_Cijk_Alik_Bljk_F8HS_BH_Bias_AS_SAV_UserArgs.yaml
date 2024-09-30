@@ -10,7 +10,7 @@
   AssignedDerivedParameters: true
   Batched: true
   BetaOnlyUseBias: true
-  BiasDataTypeList: [0]
+  BiasDataTypeList: [0, 4]
   BiasSrc: D
   ComplexConjugateA: false
   ComplexConjugateB: false
@@ -71,7 +71,7 @@
   UseE: false
   UseInitialStridesAB: false
   UseInitialStridesCD: false
-  UseScaleAB: ''
+  UseScaleAB: "Scalar"
   UseScaleAlphaVec: 1
   UseScaleCD: false
 - - 1LDSBuffer: 1
@@ -219,7 +219,7 @@
       AssignedDerivedParameters: true
       Batched: true
       BetaOnlyUseBias: true
-      BiasDataTypeList: [0]
+      BiasDataTypeList: [0, 4]
       BiasSrc: D
       ComplexConjugateA: false
       ComplexConjugateB: false
@@ -280,7 +280,7 @@
       UseE: false
       UseInitialStridesAB: false
       UseInitialStridesCD: false
-      UseScaleAB: ''
+      UseScaleAB: "Scalar"
       UseScaleAlphaVec: 1
       UseScaleCD: false
     ScheduleGlobalRead: 1
@@ -485,7 +485,7 @@
       AssignedDerivedParameters: true
       Batched: true
       BetaOnlyUseBias: true
-      BiasDataTypeList: [0]
+      BiasDataTypeList: [0, 4]
       BiasSrc: D
       ComplexConjugateA: false
       ComplexConjugateB: false
@@ -546,7 +546,7 @@
       UseE: false
       UseInitialStridesAB: false
       UseInitialStridesCD: false
-      UseScaleAB: ''
+      UseScaleAB: "Scalar"
       UseScaleAlphaVec: 1
       UseScaleCD: false
     ScheduleGlobalRead: 1
@@ -751,7 +751,7 @@
       AssignedDerivedParameters: true
       Batched: true
       BetaOnlyUseBias: true
-      BiasDataTypeList: [0]
+      BiasDataTypeList: [0, 4]
       BiasSrc: D
       ComplexConjugateA: false
       ComplexConjugateB: false
@@ -812,7 +812,7 @@
       UseE: false
       UseInitialStridesAB: false
       UseInitialStridesCD: false
-      UseScaleAB: ''
+      UseScaleAB: "Scalar"
       UseScaleAlphaVec: 1
       UseScaleCD: false
     ScheduleGlobalRead: 1
@@ -1017,7 +1017,7 @@
       AssignedDerivedParameters: true
       Batched: true
       BetaOnlyUseBias: true
-      BiasDataTypeList: [0]
+      BiasDataTypeList: [0, 4]
       BiasSrc: D
       ComplexConjugateA: false
       ComplexConjugateB: false
@@ -1078,7 +1078,7 @@
       UseE: false
       UseInitialStridesAB: false
       UseInitialStridesCD: false
-      UseScaleAB: ''
+      UseScaleAB: "Scalar"
       UseScaleAlphaVec: 1
       UseScaleCD: false
     ScheduleGlobalRead: 1
@@ -1292,7 +1292,7 @@
       AssignedDerivedParameters: true
       Batched: true
       BetaOnlyUseBias: true
-      BiasDataTypeList: [0]
+      BiasDataTypeList: [0, 4]
       BiasSrc: D
       ComplexConjugateA: false
       ComplexConjugateB: false
@@ -1355,7 +1355,7 @@
       UseE: false
       UseInitialStridesAB: false
       UseInitialStridesCD: false
-      UseScaleAB: ''
+      UseScaleAB: "Scalar"
       UseScaleAlphaVec: 1
       UseScaleCD: false
     ScheduleGlobalRead: 1
@@ -1572,7 +1572,7 @@
       AssignedDerivedParameters: true
       Batched: true
       BetaOnlyUseBias: true
-      BiasDataTypeList: [0]
+      BiasDataTypeList: [0, 4]
       BiasSrc: D
       ComplexConjugateA: false
       ComplexConjugateB: false
@@ -1635,7 +1635,7 @@
       UseE: false
       UseInitialStridesAB: false
       UseInitialStridesCD: false
-      UseScaleAB: ''
+      UseScaleAB: "Scalar"
       UseScaleAlphaVec: 1
       UseScaleCD: false
     ScheduleGlobalRead: 1
@@ -1852,7 +1852,7 @@
       AssignedDerivedParameters: true
       Batched: true
       BetaOnlyUseBias: true
-      BiasDataTypeList: [0]
+      BiasDataTypeList: [0, 4]
       BiasSrc: D
       ComplexConjugateA: false
       ComplexConjugateB: false
@@ -1915,7 +1915,7 @@
       UseE: false
       UseInitialStridesAB: false
       UseInitialStridesCD: false
-      UseScaleAB: ''
+      UseScaleAB: "Scalar"
       UseScaleAlphaVec: 1
       UseScaleCD: false
     ScheduleGlobalRead: 1
@@ -2132,7 +2132,7 @@
       AssignedDerivedParameters: true
       Batched: true
       BetaOnlyUseBias: true
-      BiasDataTypeList: [0]
+      BiasDataTypeList: [0, 4]
       BiasSrc: D
       ComplexConjugateA: false
       ComplexConjugateB: false
@@ -2195,7 +2195,7 @@
       UseE: false
       UseInitialStridesAB: false
       UseInitialStridesCD: false
-      UseScaleAB: ''
+      UseScaleAB: "Scalar"
       UseScaleAlphaVec: 1
       UseScaleCD: false
     ScheduleGlobalRead: 1
