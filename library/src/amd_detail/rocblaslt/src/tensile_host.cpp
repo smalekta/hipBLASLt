@@ -767,7 +767,8 @@ namespace
             "--bias_type",
             hipDataType_to_bench_string(tensile2HipType(problem.bias().dataType())),
             problem.useE() ? "--aux_type" : "",
-            problem.useE() ? hipDataType_to_bench_string(tensile2HipType(problem.e().dataType())) : "",
+            problem.useE() ? hipDataType_to_bench_string(tensile2HipType(problem.e().dataType()))
+                           : "",
             problem.getParams().gsu() ? "--splitk" : "",
             problem.getParams().gsu() ? std::to_string(problem.getParams().gsu()) : "",
             problem.getParams().wgm() ? "--wgm" : "",
@@ -1077,7 +1078,9 @@ namespace
             "--bias_type",
             hipDataType_to_bench_string(tensile2HipType(problem.gemms[0].bias().dataType())),
             problem.gemms[0].useE() ? "--aux_type" : "",
-            problem.gemms[0].useE() ? hipDataType_to_bench_string(tensile2HipType(problem.gemms[0].e().dataType())) : "",
+            problem.gemms[0].useE()
+                ? hipDataType_to_bench_string(tensile2HipType(problem.gemms[0].e().dataType()))
+                : "",
             problem.gemms[0].getParams().gsu() ? "--splitk" : "",
             problem.gemms[0].getParams().gsu() ? std::to_string(problem.gemms[0].getParams().gsu())
                                                : "",
@@ -1644,6 +1647,8 @@ namespace
 
         if(prob.compute_type == rocblaslt_compute_f32_fast_xf32)
             tensileProblem.setF32XdlMathOp(rocisa::DataType::XFloat32);
+        else
+            tensileProblem.setF32XdlMathOp(rocisa::DataType::Float);
 
         tensileProblem.setSwizzleTensorA(prob.swizzleA);
         tensileProblem.setSwizzleTensorB(prob.swizzleB);
@@ -1930,34 +1935,20 @@ namespace
             {
                 // Find the location of librocblaslt.so
                 // Fall back on hard-coded path if static library or not found
+                std::optional<std::filesystem::path> default_lib_path;
                 if(staticLib)
                 {
-                    path = HIPBLASLT_LIB_PATH;
+                    default_lib_path = HIPBLASLT_LIB_PATH;
                 }
-                else
+                if(auto maybe_path = rocblaslt_find_library_relative_path(
+                       /*relpath=*/std::nullopt, default_lib_path))
+                    path = std::move(*maybe_path);
+                // Optionally, look for a `processor` sub-directory under the library path.
                 {
-                    auto hipblaslt_so_path
-                        = std::filesystem::path(rocblaslt_internal_get_so_path());
-                    path = hipblaslt_so_path.parent_path();
+                    auto processor_path = path / processor;
+                    if(std::filesystem::exists(processor_path))
+                        path = std::move(processor_path);
                 }
-
-                auto pathIfExists
-                    = [](std::filesystem::path p) -> std::optional<std::filesystem::path> {
-                    if(std::filesystem::exists(p))
-                        return p;
-                    return {};
-                };
-
-                // Find the location of the libraries
-                if(auto p = pathIfExists(path / ".." / "Tensile" / "library"))
-                    path = *p;
-                else if(auto p = pathIfExists(path / "library"))
-                    path = *p;
-                else
-                    path = path / "hipblaslt" / "library";
-
-                if(auto p = pathIfExists(path / processor))
-                    path = *p;
 
                 if(get_logger_layer_mode() & rocblaslt_layer_mode_log_info)
                 {
@@ -2235,7 +2226,7 @@ TensileLite::ProblemOverride
                                         problem.trans_b == HIPBLAS_OP_N ? false : true,
                                         hipDataType_to_tensile_type(problem.a_type),
                                         hipDataType_to_tensile_type(problem.b_type),
-                                        roc2TensileType(problem.compute_type),
+                                        rocComputeType_to_tensile_type(problem.compute_type),
                                         hipDataType_to_tensile_type(problem.c_type),
                                         problem.m,
                                         problem.n,
@@ -2246,17 +2237,40 @@ TensileLite::ProblemOverride
 TensileLite::ProblemOverride TensileDataGemm2ProblemOverride(std::shared_ptr<void> gemmData)
 {
     std::shared_ptr<TensileDataGemm> data = std::static_pointer_cast<TensileDataGemm>(gemmData);
+    rocisa::DataType                 computeType      = rocisa::DataType::None;
+    rocisa::DataType                 computeInputType = data->problem.computeInputType();
+
+    if(data->problem.f32XdlMathOp() == rocisa::DataType::XFloat32)
+    {
+        computeType = rocisa::DataType::XFloat32;
+    }
+    else if(computeInputType == rocisa::DataType::BFloat16
+            || computeInputType == rocisa::DataType::Half)
+    {
+        computeType = computeInputType;
+    }
+    else
+    {
+        computeType = data->problem.computeType();
+    }
 
     return TensileLite::ProblemOverride(data->problem.transA(),
                                         data->problem.transB(),
                                         data->problem.a().dataType(),
                                         data->problem.b().dataType(),
-                                        data->problem.computeInputType(),
+                                        computeType,
                                         data->problem.c().dataType(),
                                         data->problem.freeSizeA(0),
                                         data->problem.freeSizeB(0),
                                         data->problem.boundSize(0),
                                         data->problem.batchSize(0));
+}
+
+TensileLite::ContractionProblemGemm* ExtractProblemGemm(std::shared_ptr<void> gemmData)
+{
+    std::shared_ptr<TensileDataGemm> data = std::static_pointer_cast<TensileDataGemm>(gemmData);
+
+    return &data->problem;
 }
 
 void initTensileGemmData(rocblaslt_handle       handle,
