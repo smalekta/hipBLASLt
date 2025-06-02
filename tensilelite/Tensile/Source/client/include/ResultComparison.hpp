@@ -61,6 +61,7 @@ namespace TensileLite
             }
         };
 
+
         template <typename T>
         class PointwiseComparison
         {
@@ -92,24 +93,33 @@ namespace TensileLite
 
                         if constexpr(std::is_same<int8_t, T>())
                         {
-                            std::cout << "[" << (m_printed) << "] "
-                                    << " elem=" << elemNumber << " idx=" << elemIndex << ": "
-                                    << static_cast<int>(resultValue) << (match ? "==" : "!=")
-                                    << static_cast<int>(referenceValue) << std::endl;
+                            if ((elemIndex % 64) == 0)
+                            {
+                                std::cout << "[" << (m_printed) << "] "
+                                        << " elem=" << elemNumber << " idx=" << elemIndex << ": "
+                                        << static_cast<int>(resultValue) << (match ? "==" : "!=")
+                                        << static_cast<int>(referenceValue) << std::endl;
+                            }
                         }
                         else if constexpr(std::is_same<Float8, T>() || std::is_same<BFloat8, T>())
                         {
-                            std::cout << "[" << (m_printed) << "] "
-                                    << " elem=" << elemNumber << " idx=" << elemIndex << ": "
-                                    << static_cast<float>(resultValue) << (match ? "==" : "!=")
-                                    << static_cast<float>(referenceValue) << std::endl;
+                            if ((elemIndex % 64) == 0)
+                            {
+                                std::cout << "[" << (m_printed) << "] "
+                                        << " elem=" << elemNumber << " idx=" << elemIndex << ": "
+                                        << static_cast<int>(resultValue) << "(0x" << std::hexfloat << static_cast<float>(resultValue) << ")" << (match ? "==" : "!=")
+                                        << static_cast<float>(referenceValue) << std::endl;
+                            }
                         }
                         else
                         {
-                            std::cout << "[" << (m_printed) << "] "
-                                    << " elem=" << elemNumber << " idx=" << elemIndex << ": "
-                                    << resultValue << (match ? "==" : "!=")
-                                    << referenceValue << std::endl;
+                            if ((elemIndex % 64) == 0)
+                            {
+                                std::cout << "[" << (m_printed) << "] "
+                                        << " elem=" << elemNumber << " idx=" << elemIndex << ": "
+                                        << resultValue << (match ? "==" : "!=")
+                                        << referenceValue << std::endl;
+                            }
                         }
 
                         m_printed++;
@@ -119,7 +129,7 @@ namespace TensileLite
                     }
                 }
             }
-
+            
             void report()
             {
                 if(m_errors && m_printReport)
@@ -151,6 +161,41 @@ namespace TensileLite
             bool   m_printReport = false;
             bool   m_failed      = false;
         };
+
+        template<> 
+        inline void PointwiseComparison<float>::operator()(float referenceValue, float resultValue, size_t elemIndex, size_t elemNumber)
+        {
+            m_values++;
+            bool match = AlmostEqual(referenceValue, resultValue);
+            if(!match)
+                m_errors++;
+
+            if(!match || m_printValids)
+            {
+                if(m_doPrint)
+                {
+                    if(m_printed == 0)
+                    {
+                        std::cout << "Index:  Device | Reference" << std::endl;
+                    }
+
+                    
+                    // if ((elemIndex % 64) == 0)
+                    {
+                        std::cout << "[" << (m_printed) << "] "
+                                << " elem=" << elemNumber << " idx=" << elemIndex << ": "
+                                << *reinterpret_cast<int*>(&resultValue) << (match ? "==" : "!=")
+                                << static_cast<float>(referenceValue) << std::endl;
+                    }
+                    
+                    m_printed++;
+
+                    if(m_printMax >= 0 && m_printed >= m_printMax)
+                        m_doPrint = false;
+                }
+            }
+        }
+
 
         template <typename T>
         struct Magnitude
